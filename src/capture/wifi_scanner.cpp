@@ -30,11 +30,17 @@ std::vector<AccessPoint> scan_wifi(const std::string& interface, int timeout_sec
         int res = pcap_next_ex(handle, &header, &packet);
         if (res <= 0) continue;
 
+        if (header->caplen < 40) continue; // minimal size check
+
         const u_char* radiotap = packet;
         int radiotap_len = radiotap[2] + (radiotap[3] << 8);
 
+        if (header->caplen < radiotap_len + 36) continue; // avoid OOB
+
         const u_char* frame = packet + radiotap_len;
-        if ((frame[0] & 0xF0) != 0x80) continue; // Only Beacon
+
+        // 0x80 = Beacon frame
+        if ((frame[0] & 0xF0) != 0x80) continue;
 
         const uint8_t* bssid = frame + 16;
         std::string bssid_str = mac_to_str(bssid);
@@ -47,13 +53,14 @@ std::vector<AccessPoint> scan_wifi(const std::string& interface, int timeout_sec
         int signal = 0;
 
         int i = 0;
-        while (i + 2 < tag_len) {
+        while (i + 2 <= tag_len) {
             uint8_t tag_id = tags[i];
             uint8_t len = tags[i + 1];
+
             if (i + 2 + len > tag_len) break;
 
             if (tag_id == 0 && len > 0) {
-                ssid = std::string((const char*)&tags[i + 2], len);
+                ssid = std::string(reinterpret_cast<const char*>(&tags[i + 2]), len);
             } else if (tag_id == 3 && len == 1) {
                 channel = tags[i + 2];
             }
