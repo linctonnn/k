@@ -1,0 +1,7 @@
+build/
+*.o
+*.out
+*.cap
+*.pcapng
+*.log
+wifi_bruteforce
