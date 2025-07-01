@@ -35,10 +35,10 @@ sudo ./wifi_bruteforce
 
 ## Status
 
--   [x]scan wifi
--   [x]auto monitor mode
--   [x]pmk generator (pbkdf2)
--   [ ]parse .cap
--   [ ]brute pake wordlist
--   [ ]live capture handshake
--   [ ]threading
+- [x] scan wifi
+- [x] auto monitor mode
+- [x] pmk generator (pbkdf2)
+- [ ] parse .cap
+- [ ] brute pake wordlist
+- [ ] live capture handshake
+- [ ] threading
